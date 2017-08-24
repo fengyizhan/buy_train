@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：必须与对应的接口全类名一致 id:必须与对应接口的某个对应的方法名一致 -->
+<mapper namespace="com.tm.persistence.TrainMachineMapper">
+	<!-- mybsits_config中配置的alias类别名,也可直接配置resultType为类路径 -->
+	<insert id="insertMachine" useGeneratedKeys="true" keyProperty="PKID"
+		parameterType="com.tm.entity.TrainMachine">
+		insert into TrainPassenger(
+		Number,Enabled,OrderLimit)
+		values
+		(
+		#{Number},#{Enabled},#{OrderLimit}
+		)
+	</insert>
+
+	<select id="updateMachine" parameterType="com.tm.entity.TrainMachine">
+		update TrainMachine set Enabled=#{Enabled},OrderLimit=#{OrderLimit} where Number=#{Number}
+	</select>
+	
+	<select id="updateMachineLastSyncDate" parameterType="com.tm.entity.TrainMachine">
+		update TrainMachine set LastSyncDate=#{LastSyncDate} where Number=#{Number}
+	</select>
+	
+	<select id="findMachineByNumber" parameterType="String" resultType="com.tm.entity.TrainMachine">
+		select * from TrainMachine where Number=#{Number}
+	</select>
+	
+</mapper>

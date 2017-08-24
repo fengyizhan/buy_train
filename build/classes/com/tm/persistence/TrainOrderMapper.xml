@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+	namespace：必须与对应的接口全类名一致
+	id:必须与对应接口的某个对应的方法名一致
+ -->
+<mapper namespace="com.tm.persistence.KafkaLogMapper">
+	<!-- mybsits_config中配置的alias类别名,也可直接配置resultType为类路径 -->
+    
+	<select id="findById" parameterType="int" resultType="KafkaLog">
+		select * from log_kafka_meta t where t.id=#{log_id}
+	</select>
+	
+	<select id="findAll" resultType="KafkaLog" parameterType="java.util.Map">
+		select * from log_kafka_meta t 
+		 where t.msg_lag<![CDATA[>=]]>#{offset_threshold,jdbcType=INTEGER} 
+		<if test="start_msg_timestam != null and start_msg_timestam != '' and end_msg_timestam != null and end_msg_timestam != ''" >
+		 and (msg_timestam between to_date(#{start_msg_timestam},'yyyy-MM-dd HH24:mi') and to_date(#{end_msg_timestam},'yyyy-MM-dd HH24:mi') )
+		</if>
+		<if test="batid != null and batid != '' and batid != '-1'" >
+		 and batid=#{batid}
+		</if>
+		<if test="batid == null or batid == ''" >
+		 and batid=(select max(batid) batid from log_kafka_meta) 
+		</if>
+		<if test="group != null and group != ''" >
+		 and msg_group=#{group}
+		</if>
+		<if test="topic != null and topic != ''" >
+		 and msg_topic=#{topic}
+		</if>
+		<if test="partition != null and partition != ''" >
+		 and msg_partition=#{partition}
+		</if>
+		order by msg_group,msg_topic,msg_partition
+	</select>
+</mapper>

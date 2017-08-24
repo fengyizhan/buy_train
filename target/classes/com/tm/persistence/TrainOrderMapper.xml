@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：必须与对应的接口全类名一致 id:必须与对应接口的某个对应的方法名一致 -->
+<mapper namespace="com.tm.persistence.TrainOrderMapper">
+	<resultMap type="com.tm.entity.TrainOrder" id="queryOrderPassenger">
+		<id column="PKID" property="PKID" javaType="long" jdbcType="INTEGER"/>
+		<result column="AgentId" property="AgentId"/>
+		<result column="OrderNumber" property="OrderNumber"/>
+		<result column="OrderNumberAgent" property="OrderNumberAgent"/>
+		<result column="OrderNumber12306" property="OrderNumber12306"/>
+		<result column="OrderState" property="OrderState"/>
+		<result column="OrderNumber12306" property="OrderNumber12306"/>
+		<result column="OfficialOrderState" property="OfficialOrderState"/>
+		<result column="From_station" property="From_station"/>
+		<result column="To_station" property="To_station"/>
+		<result column="From_station_name" property="From_station_name"/>
+		<result column="To_station_name" property="To_station_name"/>
+		<result column="StartDate" property="StartDate"/>
+		<result column="StartTime" property="StartTime"/>
+		<result column="SecondTrainNo" property="SecondTrainNo"/>
+		<result column="SecondSeats" property="SecondSeats"/>
+		<result column="SecondStartDate" property="SecondStartDate"/>
+		<result column="OfficialAccount" property="OfficialAccount"/>
+		<result column="OfficialPassword" property="OfficialPassword"/>
+		<result column="GrapTicketMachineNo" property="GrapTicketMachineNo"/>
+		<result column="NeedNoSeat" property="NeedNoSeat"/>
+		<result column="DeadlineTime" property="DeadlineTime" javaType="java.sql.Timestamp" jdbcType="TIMESTAMP"/>
+		<result column="TotalPrice" property="TotalPrice"/>
+		<result column="CreateTime" property="CreateTime" javaType="java.sql.Timestamp" jdbcType="TIMESTAMP"/>
+		<!-- ofType指定students集合中的对象类型 -->
+		<collection property="passengers" javaType="java.util.List"
+			ofType="com.tm.entity.TrainPassenger">
+			<id property="PKID" column="p_ID" javaType="long" jdbcType="INTEGER"/>
+			<result column="Name" property="Name"/>
+			<result column="IdentifyType" property="IdentifyType"/>
+			<result column="IdentifyNumber" property="IdentifyNumber"/>
+			<result column="TicketType" property="TicketType"/>
+			<result column="Price" property="Price"/>
+			<result column="SeatType" property="SeatType"/>
+			<result column="Room_no" property="Room_no"/>
+			<result column="Seat_name" property="Seat_name"/>
+		</collection>
+	</resultMap>
+	<!-- mybsits_config中配置的alias类别名,也可直接配置resultType为类路径 -->
+	<insert id="insertOrder" useGeneratedKeys="true" keyProperty="PKID"	parameterType="com.tm.entity.TrainOrder">
+		insert into TrainOrder(
+		AgentId,OrderNumber,OrderNumberAgent,OrderState,OfficialOrderState,from_station,to_station,from_station_name,to_station_name,
+		StartDate,StartTime,SecondTrainNo,SecondSeats,SecondStartDate,OfficialAccount,OfficialPassword,GrapTicketMachineNo,
+		NeedNoSeat,DeadlineTime,TotalPrice,CreateTime)
+		values
+		(
+		#{AgentId},#{OrderNumber},#{OrderNumberAgent},#{OrderState},
+		#{OfficialOrderState},#{from_station},#{to_station},#{from_station_name},#{to_station_name},#{StartDate},#{StartTime},#{SecondTrainNo},
+		#{SecondSeats},#{SecondStartDate},#{OfficialAccount},#{OfficialPassword},#{GrapTicketMachineNo},#{NeedNoSeat},#{DeadlineTime},#{TotalPrice},#{CreateTime}
+		)
+	</insert>
+
+	<select id="findByOrderNumber" parameterType="String" resultMap="queryOrderPassenger">
+		select o.*,p.PKID
+		p_ID,p.FKOrderId,p.Name,p.IdentifyType,p.IdentifyNumber,p.TicketType,p.Price,p.SeatType,p.Room_no,p.Seat_name
+		from TrainOrder o left join TrainPassenger p on o.PKID=p.FKOrderId
+		where o.OrderNumber=#{OrderNumber}
+	</select>
+
+	<select id="findByMachineNo" parameterType="String" resultMap="queryOrderPassenger">
+		select o.*,p.PKID
+		p_ID,p.FKOrderId,p.Name,p.IdentifyType,p.IdentifyNumber,p.TicketType,p.Price,p.SeatType,p.Room_no,p.Seat_name
+		from TrainOrder o left join TrainPassenger p on o.PKID=p.FKOrderId
+		where o.GrapTicketMachineNo=#{GrapTicketMachineNo} and o.OrderState=2
+	</select>
+	
+	<select id="updateOrder" parameterType="com.tm.entity.TrainOrder">
+		update TrainOrder
+		set OrderNumber12306=#{OrderNumber12306},TotalPrice=#{TotalPrice},OrderState=3
+		where
+		OrderNumber=#{OrderNumber}
+	</select>
+
+	<select id="cancelByOrderNumber" parameterType="String">
+		update TrainOrder
+		set OrderState=4 where OrderNumber=#{OrderNumber}
+	</select>
+</mapper>

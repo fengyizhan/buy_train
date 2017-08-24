@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+encoding//src/com/tm/kafka/WebKafkaManager.java=gbk
+encoding//src/com/tm/utils/CommandClient.java=gbk
+encoding//src/com/tm/utils/CommandUtil.java=gbk
+encoding//src/com/tm/utils/KafkaManager.java=gbk
